@@ -12,9 +12,9 @@ export default function Home({posts}) {
       </Head>
 
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-12'>
-        <div className='lg:col-span-8 col-span-1'>
+        <div className='xl:grid xl:grid-cols-2 xl:gap-4 lg:col-span-8 col-span-1'>
           {posts?.map((post, index) => (
-            <PostCard post={post} key={index}/>
+            <PostCard post={post.node} key={index}/>
           ))}
         </div>
 
