@@ -65,7 +65,7 @@ export const getRecentPosts = async () => {
 
 
 ////////Get Similar Posts//////////
-export const getSimilarPosts = async () => {
+export const getSimilarPosts = async (categories,slug) => {
   const query = gql`
     query getPostDetails($slug: String!, $categories: [String!]){
       posts(
@@ -81,7 +81,97 @@ export const getSimilarPosts = async () => {
       }
     }`
 
-  const result = await request(graphqlAPI, query)
+  const result = await request(graphqlAPI, query, {categories, slug})
   console.log("All Similar Posts:", result.posts);
   return result.posts
+}
+
+
+
+
+/////////Get Category////////
+export const getCategories = async () => {
+  const query = gql`
+    query GetCategories{
+      categories{
+        name,
+        slug
+      }
+    }
+  `
+
+  const result = await request(graphqlAPI, query)
+  return result.categories
+}
+
+
+
+
+//////Get Post Details ////////
+export const getPostDetails = async (slug) => {
+  const query = gql`
+    query GetPostDetails($slug: String!) {
+      post(where: {slug: $slug}){
+        author {
+          bio
+          id
+          name
+          photo {
+            url
+          }
+        }
+        createdAt
+        excerpt
+        title
+        slug
+        featuredImage {
+          url
+        }
+        categories {
+          name
+          slug
+        }
+        content{
+          raw
+        }
+      }
+    }
+  `
+
+  const result = await request(graphqlAPI, query, {slug});
+  console.log("Post Details:", result.post);
+  return result.post
+};
+
+
+
+///////////Post Comment/////
+export const submitComment = async (obj) => {
+  const result = await fetch('/api/comments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(obj),
+  });
+
+  return result.json()
+}
+
+
+
+/////////Get Comments////////
+export const getComments = async (slug) => {
+  const query = gql`
+    query GetComments($slug: String!){
+      comments(where: { post: { slug: $slug } } ){
+        name,
+        createdAt,
+        comment
+      }
+    }
+  `
+
+  const result = await request(graphqlAPI, query, {slug})
+  return result.comments
 }
