@@ -34,7 +34,6 @@ export const getPosts = async () => {
   `
 
   const results = await request(graphqlAPI, query);
-  console.log("All Posts:", results.postsConnection.edges);
   return results.postsConnection.edges
 };
 
@@ -42,7 +41,7 @@ export const getPosts = async () => {
 ////////Get All Recent Posts////////
 export const getRecentPosts = async () => {
   const query = gql`
-    query getPostDetails(){
+    query GetPostDetails(){
       posts(
         orderBy: createdAt_ASC
         last: 3
@@ -67,7 +66,7 @@ export const getRecentPosts = async () => {
 ////////Get Similar Posts//////////
 export const getSimilarPosts = async () => {
   const query = gql`
-    query getPostDetails($slug: String!, $categories: [String!]){
+    query GetPostDetails($slug: String!, $categories: [String!]){
       posts(
         where: { slug_not: $slug, AND: {categories_some: { slug_in: $categories}}},
         last: 3
@@ -85,3 +84,59 @@ export const getSimilarPosts = async () => {
   console.log("All Similar Posts:", result.posts);
   return result.posts
 }
+
+
+//////Get Category/////
+export const getCategories = async () => {
+  const query = gql`
+    query GetCategories {
+      categories {
+        name
+        id
+        slug
+      }
+    }  
+  `
+
+  const result = await request(graphqlAPI, query);
+  console.log("Category Name:",result.categories);
+  return result.categories;
+
+}
+
+
+///////Get Post Details/////////
+export const getPostDetails = async (slug) => {
+  const query = gql`
+    query GetPostDetails($slug : String!) {
+      post(where: {slug: $slug}) {
+        title
+        excerpt
+        featuredImage {
+          url
+        }
+        author{
+          name
+          bio
+          photo {
+            url
+          }
+        }
+        createdAt
+        slug
+        content {
+          raw
+        }
+        categories {
+          name
+          slug
+        }
+      }
+    }
+  `;
+
+  const result = await request(graphqlAPI, query, { slug });
+
+  return result.post;
+};
+
